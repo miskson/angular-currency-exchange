@@ -1,14 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-
-interface Icurrency {
-  currencyCodeA: number;
-  currencyCodeB: number;
-  rateBuy?: number;
-  rateSell?: number;
-  rateCross?: number;
-}
+import { CurrencyInfo } from '../../interfaces/data';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +11,7 @@ export class DataService {
 
   constructor(private http: HttpClient) {}
 
-  getApiCurrencyData(): Observable<Icurrency[]> {
-    return this.http.get<Icurrency[]>(this.apiUrl);
+  getApiCurrencyData(): Observable<CurrencyInfo[]> {
+    return this.http.get<CurrencyInfo[]>(this.apiUrl);
   }
 }

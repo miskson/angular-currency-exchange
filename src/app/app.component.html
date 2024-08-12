@@ -1,24 +1,26 @@
 <main class="main">
-  <app-exchange-header></app-exchange-header>
+  <app-exchange-header [currencies]="dataUah"></app-exchange-header>
   <div class="content-wrapper">
     <div class="content">
       <div class="content__from">
         <h3>From:</h3>
-        <select name="from-select" id="from-currency-select">
-          <option value="UAH">UAH</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
+        <select name="from-select" id="from-currency-select" (change)="onSellCurrencyChange($event)"
+          [value]="currentSellCurrency">
+          <option value="980">UAH</option>
+          <option value="840">USD</option>
+          <option value="978">EUR</option>
         </select>
-        <input type="number">
+        <input name="sell" type="number" [value]="sellValue" min="1" (change)="onSellInputChange($event)">
       </div>
       <div class="content__to">
         <h3>To:</h3>
-        <select name="to-select" id="to-currency-select">
-          <option value="UAH">UAH</option>
-          <option value="USD" selected>USD</option>
-          <option value="EUR">EUR</option>
+        <select name="to-select" id="to-currency-select" [value]="currentBuyCurrency"
+          (change)="onBuyCurrencyChange($event)">
+          <option value="980">UAH</option>
+          <option value="840">USD</option>
+          <option value="978">EUR</option>
         </select>
-        <input type="number">
+        <input name="buy" type="number" min="1" [value]="buyValue" (change)="onBuyInputChange($event)">
       </div>
     </div>
   </div>
