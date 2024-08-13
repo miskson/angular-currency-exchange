@@ -10,7 +10,7 @@
           <option value="840">USD</option>
           <option value="978">EUR</option>
         </select>
-        <input name="sell" type="number" [value]="sellValue" min="1" (change)="onSellInputChange($event)">
+        <input name="sell" type="number" min="1" [(ngModel)]="sellValue" (ngModelChange)="onSellInputChange($event)">
       </div>
       <div class="content__to">
         <h3>To:</h3>
@@ -20,7 +20,7 @@
           <option value="840">USD</option>
           <option value="978">EUR</option>
         </select>
-        <input name="buy" type="number" min="1" [value]="buyValue" (change)="onBuyInputChange($event)">
+        <input ame="buy" type="number" min="1" [(ngModel)]="buyValue" (ngModelChange)="onBuyInputChange($event)">
       </div>
     </div>
   </div>
