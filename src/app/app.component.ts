@@ -22,8 +22,8 @@ export class AppComponent implements OnInit {
 
   currentSellCurrency: string = '980';
   currentBuyCurrency: string = '840';
-  sellValue?: string = '1';
-  buyValue?: string = '1';
+  sellValue?: number = 1;
+  buyValue?: number = 1;
 
   onSellCurrencyChange(e: Event): void {
     this.currentSellCurrency = (e.target as HTMLInputElement).value;
@@ -36,12 +36,12 @@ export class AppComponent implements OnInit {
   }
 
   onSellInputChange(e: Event): void {
-    this.sellValue = (e.target as HTMLInputElement).value;
+    this.sellValue = +(e.target as HTMLInputElement).value;
     this.convertCurrency('sell');
   }
 
   onBuyInputChange(e: Event): void {
-    this.buyValue = (e.target as HTMLInputElement).value;
+    this.buyValue = +(e.target as HTMLInputElement).value;
     this.convertCurrency('buy');
   }
 
@@ -52,18 +52,48 @@ export class AppComponent implements OnInit {
       this.buyValue = temp;
     }
 
+    let currentHrnArr: CurrencyInfo[] = [];
+    let actualCurrency: CurrencyInfo | undefined;
+
+    console.log(
+      'CURRENCY CONVERT',
+      operation,
+      'currentSellCurrency',
+      this.currentSellCurrency,
+      'currentBuyCurrency',
+      this.currentBuyCurrency
+    );
+
+    if (+this.currentSellCurrency === 980 || +this.currentBuyCurrency === 980) {
+      currentHrnArr = this.data.filter(
+        (currency) => currency.currencyCodeB === 980
+      );
+      console.log('currentHrnArr', currentHrnArr);
+    }
     // to fix
-    if (operation === 'buy') {
-      if (+this.currentBuyCurrency === +this.currentSellCurrency) {
-        this.buyValue = this.sellValue + '';
-        return;
+
+    if (operation === 'sell') {
+      console.log('sell');
+
+      console.log('currentHrnArr.length', currentHrnArr.length, currentHrnArr);
+      if (currentHrnArr.length > 0) {
+        actualCurrency = currentHrnArr.find(
+          (currency) => +this.currentBuyCurrency === currency.currencyCodeA
+        );
+
+        this.buyValue =
+          (this.sellValue as number) / (actualCurrency?.rateSell as number);
+
+        console.log('ACTUAL ARR', actualCurrency, this.buyValue);
+      } else {
+        actualCurrency = this.data.find(
+          (currency) => currency.currencyCodeB !== 980
+        );
+        this.buyValue =
+          (this.sellValue as number) / (actualCurrency?.rateSell as number);
       }
-    } else if ('sell') {
-      if (+this.currentBuyCurrency === +this.currentSellCurrency) {
-        this.sellValue = this.buyValue;
-        this.buyValue = this.sellValue;
-        return;
-      }
+    } else if ('buy') {
+      console.log('buy');
     }
   }
 
@@ -87,5 +117,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCurrencyData();
+    this.convertCurrency('sell');
   }
 }
