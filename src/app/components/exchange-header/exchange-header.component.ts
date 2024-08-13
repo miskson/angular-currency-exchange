@@ -17,7 +17,5 @@ export class ExchangeHeaderComponent {
     '978': 'EUR',
   };
 
-  ngOnInit(): void {
-    console.log('header', this.currencies);
-  }
+  ngOnInit(): void {}
 }
