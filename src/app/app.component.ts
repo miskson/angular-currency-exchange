@@ -4,8 +4,9 @@ import { ExchangeHeaderComponent } from './components/exchange-header/exchange-h
 import { HttpClientModule } from '@angular/common/http';
 import { DataService } from './services/data/data.service';
 import { CurrencyInfo } from './interfaces/data';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, retryWhen, switchMap, throwError, timer } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ import { FormsModule } from '@angular/forms';
     ExchangeHeaderComponent,
     HttpClientModule,
     FormsModule,
+    NgIf,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -24,6 +26,8 @@ export class AppComponent implements OnInit {
 
   constructor(private dataService: DataService) {}
 
+  isLoading: boolean = false;
+  loadingMessage: string = 'Loading, please wait...';
   data: CurrencyInfo[] = [];
   dataUah: CurrencyInfo[] = [];
 
@@ -140,9 +144,42 @@ export class AppComponent implements OnInit {
     }
   }
 
+  private loadCurrencyData(): void {
+    this.isLoading = true;
+    this.loadingMessage = 'Loading, please wait...';
+    this.getCurrencyData()
+      .then(() => {
+        this.convertCurrency('sell');
+      })
+      .catch((err) => {
+        console.error(err, 'Failed to load currency data');
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+  }
+
   async getCurrencyData(): Promise<void> {
     try {
-      const res = await firstValueFrom(this.dataService.getApiCurrencyData());
+      const res = await firstValueFrom(
+        this.dataService.getApiCurrencyData().pipe(
+          retryWhen((errors) =>
+            errors.pipe(
+              switchMap((error) => {
+                if (error.status === 429) {
+                  console.warn(
+                    'Too many requests. Retrying to get data in 30 seconds...'
+                  );
+                  this.loadingMessage =
+                    'Too many requests. Retrying to get data...';
+                  return timer(30000);
+                }
+                return throwError(error);
+              })
+            )
+          )
+        )
+      );
       this.data = res.filter((currency) => !currency.rateCross);
       this.dataUah = this.data.filter(
         (currency) => currency.currencyCodeB === 980
@@ -152,8 +189,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  async ngOnInit(): Promise<void> {
-    await this.getCurrencyData();
-    this.convertCurrency('sell');
+  ngOnInit(): void {
+    this.loadCurrencyData();
   }
 }
