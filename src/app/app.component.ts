@@ -71,6 +71,7 @@ export class AppComponent implements OnInit {
 
   convertCurrency(operation: 'sell' | 'buy') {
     if (+this.currentBuyCurrency === +this.currentSellCurrency) {
+      //if currencies are the same then rate 1-1
       const temp = operation === 'sell' ? +this.sellValue : this.buyValue;
       this.sellValue = temp;
       this.buyValue = temp;
@@ -82,19 +83,21 @@ export class AppComponent implements OnInit {
         +this.currentSellCurrency === 980 ||
         +this.currentBuyCurrency === 980
       ) {
+        // if UAH is present in either sell or buy operation
+        // get all currencies with currencyCode === 980 (UAH)
         currentUAHArr = this.data.filter(
           (currency) => currency.currencyCodeB === 980
+        );
+
+        actualCurrency = currentUAHArr.find(
+          (currency) =>
+            +this.currentBuyCurrency === currency.currencyCodeA ||
+            +this.currentSellCurrency === currency.currencyCodeA
         );
       }
 
       if (operation === 'sell') {
         if (currentUAHArr.length > 0) {
-          actualCurrency = currentUAHArr.find(
-            (currency) =>
-              +this.currentBuyCurrency === currency.currencyCodeA ||
-              +this.currentSellCurrency === currency.currencyCodeA
-          );
-
           const sellRate =
             +this.currentBuyCurrency === 980
               ? (actualCurrency?.rateSell as number)
@@ -116,12 +119,6 @@ export class AppComponent implements OnInit {
         }
       } else if (operation === 'buy') {
         if (currentUAHArr.length > 0) {
-          actualCurrency = currentUAHArr.find(
-            (currency) =>
-              +this.currentBuyCurrency === currency.currencyCodeA ||
-              +this.currentSellCurrency === currency.currencyCodeA
-          );
-
           const buyRate =
             +this.currentSellCurrency === 980
               ? (actualCurrency?.rateBuy as number)
