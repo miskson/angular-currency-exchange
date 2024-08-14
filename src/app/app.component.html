@@ -3,7 +3,7 @@
   <div class="content-wrapper">
     <div class="content">
       <div class="content__from">
-        <h3>From:</h3>
+        <h3>Sell:</h3>
         <select name="from-select" id="from-currency-select" (change)="onSellCurrencyChange($event)"
           [value]="currentSellCurrency">
           <option value="980">UAH</option>
@@ -13,7 +13,7 @@
         <input name="sell" type="number" min="1" [(ngModel)]="sellValue" (ngModelChange)="onSellInputChange($event)">
       </div>
       <div class="content__to">
-        <h3>To:</h3>
+        <h3>Buy:</h3>
         <select name="to-select" id="to-currency-select" [value]="currentBuyCurrency"
           (change)="onBuyCurrencyChange($event)">
           <option value="980">UAH</option>

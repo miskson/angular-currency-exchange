@@ -58,7 +58,6 @@ export class AppComponent implements OnInit {
       this.sellValue = temp;
       this.buyValue = temp;
     } else {
-      console.log(this.sellValue, this.sellValue);
       let currentHrnArr: CurrencyInfo[] = [];
       let actualCurrency: CurrencyInfo | undefined;
 
@@ -72,48 +71,54 @@ export class AppComponent implements OnInit {
       }
 
       if (operation === 'sell') {
-        console.log('sell');
-        console.log(
-          'currentHrnArr.length',
-          currentHrnArr.length,
-          currentHrnArr
-        );
-
         if (currentHrnArr.length > 0) {
           actualCurrency = currentHrnArr.find(
-            (currency) => +this.currentBuyCurrency === currency.currencyCodeA
+            (currency) =>
+              +this.currentBuyCurrency === currency.currencyCodeA ||
+              +this.currentSellCurrency === currency.currencyCodeA
           );
 
-          this.buyValue =
-            (this.sellValue as number) / (actualCurrency?.rateSell as number);
+          const sellRate =
+            +this.currentBuyCurrency === 980
+              ? (actualCurrency?.rateSell as number)
+              : 1 / (actualCurrency?.rateSell as number);
+
+          this.buyValue = (this.sellValue as number) * sellRate;
+
         } else {
           actualCurrency = this.data.find(
             (currency) => currency.currencyCodeB !== 980
           );
-          this.buyValue =
-            (this.sellValue as number) / (actualCurrency?.rateSell as number);
+          let rate =
+            +this.currentSellCurrency === actualCurrency?.currencyCodeA
+              ? (actualCurrency?.rateSell as number)
+              : 1 / (actualCurrency?.rateSell as number);
+
+          this.buyValue = (this.sellValue as number) * rate;
         }
       } else if (operation === 'buy') {
-        console.log('operation === buy', this.buyValue, this.sellValue);
         if (currentHrnArr.length > 0) {
           actualCurrency = currentHrnArr.find(
-            (currency) => +this.currentBuyCurrency === currency.currencyCodeA
+            (currency) =>
+              +this.currentBuyCurrency === currency.currencyCodeA ||
+              +this.currentSellCurrency === currency.currencyCodeA
           );
 
-          console.log(actualCurrency, currentHrnArr);
-          console.log(actualCurrency?.rateBuy);
-          console.log(this.buyValue);
-          console.log(
-            (this.buyValue * 1) / (actualCurrency?.rateBuy as number)
-          );
-          this.sellValue =
-            (this.buyValue as number) * (actualCurrency?.rateBuy as number);
+          const buyRate =
+            +this.currentSellCurrency === 980
+              ? (actualCurrency?.rateBuy as number)
+              : 1 / (actualCurrency?.rateBuy as number);
+
+          this.sellValue = (this.buyValue as number) * buyRate;
         } else {
           actualCurrency = this.data.find(
             (currency) => currency.currencyCodeB !== 980
           );
-          this.sellValue =
-            (this.buyValue as number) * (actualCurrency?.rateBuy as number);
+          let rate =
+            +this.currentBuyCurrency === actualCurrency?.currencyCodeB
+              ? 1 / (actualCurrency?.rateBuy as number)
+              : (actualCurrency?.rateBuy as number);
+          this.sellValue = (this.buyValue as number) * rate;
         }
       }
     }
@@ -126,7 +131,6 @@ export class AppComponent implements OnInit {
       this.dataUah = this.data.filter(
         (currency) => currency.currencyCodeB === 980
       );
-      console.log('RES', this.data, this.dataUah);
     } catch (err) {
       console.error(err, 'Request error!');
     }
