@@ -1,0 +1,10 @@
+<header>
+    <h1>AConverter</h1>
+    @for(currency of currencies; track currency.currencyCodeA) {
+    <div>
+        <h3>{{currencyCodes[currency.currencyCodeA.toString()]}}</h3>
+        <h4>Buy: {{currency.rateBuy}}</h4>
+        <h4>Sell: {{currency.rateSell}}</h4>
+    </div>
+    }
+</header>
