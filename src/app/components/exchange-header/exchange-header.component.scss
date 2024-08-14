@@ -1,0 +1,58 @@
+.app-header {
+    color: #fff;
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 4px #ccc;
+    background-color: #101010;
+    padding: 0 8px;
+    border-radius: 0px 0px 5px 5px;
+
+    @media (min-width: 370px) {
+        padding: 0 20px;
+    }
+
+}
+
+.app-header__title {
+    &_red-highlight {
+        color: #fa5255;
+    }
+
+    @media (max-width: 520px) {
+        font-size: 18px;
+        padding: 4px;
+    }
+}
+
+.app-header__currencies-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 8px 0;
+    @media (max-width: 420px) {
+        gap: 15px;
+    }
+}
+
+.app-header__currency {
+    padding: 8px 0;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    &-buy,
+    &-sell {
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    @media (max-width: 520px) {
+        padding: 5px;
+        &-buy,
+        &-sell {
+            font-size: 12px;
+        }
+    }
+}
