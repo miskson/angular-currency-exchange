@@ -27,8 +27,8 @@ export class AppComponent implements OnInit {
   data: CurrencyInfo[] = [];
   dataUah: CurrencyInfo[] = [];
 
-  currentSellCurrency: string = '840';
-  currentBuyCurrency: string = '980';
+  currentSellCurrency: string = '980';
+  currentBuyCurrency: string = '840';
   sellValue: number = 1;
   buyValue: number = 1;
 
@@ -43,13 +43,11 @@ export class AppComponent implements OnInit {
   }
 
   onSellInputChange(value: number): void {
-    // this.sellValue = +(e.target as HTMLInputElement).value;
     this.sellValue = value;
     this.convertCurrency('sell');
   }
 
   onBuyInputChange(value: number): void {
-    // this.buyValue = +(e.target as HTMLInputElement).value;
     this.buyValue = value;
     this.convertCurrency('buy');
   }
@@ -60,18 +58,9 @@ export class AppComponent implements OnInit {
       this.sellValue = temp;
       this.buyValue = temp;
     } else {
-      console.log('ELSE BLOCK');
+      console.log(this.sellValue, this.sellValue);
       let currentHrnArr: CurrencyInfo[] = [];
       let actualCurrency: CurrencyInfo | undefined;
-
-      // console.log(
-      //   'CURRENCY CONVERT',
-      //   operation,
-      //   'currentSellCurrency',
-      //   this.currentSellCurrency,
-      //   'currentBuyCurrency',
-      //   this.currentBuyCurrency
-      // );
 
       if (
         +this.currentSellCurrency === 980 ||
@@ -104,13 +93,19 @@ export class AppComponent implements OnInit {
           this.buyValue =
             (this.sellValue as number) / (actualCurrency?.rateSell as number);
         }
-      } else if ('buy') {
-        console.log('buy');
+      } else if (operation === 'buy') {
+        console.log('operation === buy', this.buyValue, this.sellValue);
         if (currentHrnArr.length > 0) {
           actualCurrency = currentHrnArr.find(
-            (currency) => +this.currentSellCurrency === currency.currencyCodeA
+            (currency) => +this.currentBuyCurrency === currency.currencyCodeA
           );
 
+          console.log(actualCurrency, currentHrnArr);
+          console.log(actualCurrency?.rateBuy);
+          console.log(this.buyValue);
+          console.log(
+            (this.buyValue * 1) / (actualCurrency?.rateBuy as number)
+          );
           this.sellValue =
             (this.buyValue as number) * (actualCurrency?.rateBuy as number);
         } else {
