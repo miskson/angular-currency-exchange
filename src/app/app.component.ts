@@ -32,6 +32,23 @@ export class AppComponent implements OnInit {
   sellValue: number = 1;
   buyValue: number = 1;
 
+  trimDigits(num: number) {
+    if (!Number.isInteger(num)) {
+      let [beforeDot, afterDot] = num.toString().split('.');
+      let formated =
+        +beforeDot >= 1
+          ? beforeDot + '.' + afterDot.slice(0, 2)
+          : beforeDot +
+            '.' +
+            (+afterDot.slice(0, 3) % 10 > 0
+              ? afterDot.slice(0, 3)
+              : afterDot.slice(0, 2));
+      return +formated;
+    } else {
+      return num;
+    }
+  }
+
   onSellCurrencyChange(e: Event): void {
     this.currentSellCurrency = (e.target as HTMLInputElement).value;
     this.convertCurrency('sell');
@@ -58,21 +75,21 @@ export class AppComponent implements OnInit {
       this.sellValue = temp;
       this.buyValue = temp;
     } else {
-      let currentHrnArr: CurrencyInfo[] = [];
+      let currentUAHArr: CurrencyInfo[] = [];
       let actualCurrency: CurrencyInfo | undefined;
 
       if (
         +this.currentSellCurrency === 980 ||
         +this.currentBuyCurrency === 980
       ) {
-        currentHrnArr = this.data.filter(
+        currentUAHArr = this.data.filter(
           (currency) => currency.currencyCodeB === 980
         );
       }
 
       if (operation === 'sell') {
-        if (currentHrnArr.length > 0) {
-          actualCurrency = currentHrnArr.find(
+        if (currentUAHArr.length > 0) {
+          actualCurrency = currentUAHArr.find(
             (currency) =>
               +this.currentBuyCurrency === currency.currencyCodeA ||
               +this.currentSellCurrency === currency.currencyCodeA
@@ -83,8 +100,9 @@ export class AppComponent implements OnInit {
               ? (actualCurrency?.rateSell as number)
               : 1 / (actualCurrency?.rateSell as number);
 
-          this.buyValue = (this.sellValue as number) * sellRate;
-
+          this.buyValue = this.trimDigits(
+            (this.sellValue as number) * sellRate
+          );
         } else {
           actualCurrency = this.data.find(
             (currency) => currency.currencyCodeB !== 980
@@ -94,11 +112,11 @@ export class AppComponent implements OnInit {
               ? (actualCurrency?.rateSell as number)
               : 1 / (actualCurrency?.rateSell as number);
 
-          this.buyValue = (this.sellValue as number) * rate;
+          this.buyValue = this.trimDigits((this.sellValue as number) * rate);
         }
       } else if (operation === 'buy') {
-        if (currentHrnArr.length > 0) {
-          actualCurrency = currentHrnArr.find(
+        if (currentUAHArr.length > 0) {
+          actualCurrency = currentUAHArr.find(
             (currency) =>
               +this.currentBuyCurrency === currency.currencyCodeA ||
               +this.currentSellCurrency === currency.currencyCodeA
@@ -109,7 +127,7 @@ export class AppComponent implements OnInit {
               ? (actualCurrency?.rateBuy as number)
               : 1 / (actualCurrency?.rateBuy as number);
 
-          this.sellValue = (this.buyValue as number) * buyRate;
+          this.sellValue = this.trimDigits((this.buyValue as number) * buyRate);
         } else {
           actualCurrency = this.data.find(
             (currency) => currency.currencyCodeB !== 980
@@ -118,7 +136,8 @@ export class AppComponent implements OnInit {
             +this.currentBuyCurrency === actualCurrency?.currencyCodeB
               ? 1 / (actualCurrency?.rateBuy as number)
               : (actualCurrency?.rateBuy as number);
-          this.sellValue = (this.buyValue as number) * rate;
+
+          this.sellValue = this.trimDigits((this.buyValue as number) * rate);
         }
       }
     }
