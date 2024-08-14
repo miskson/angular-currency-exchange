@@ -1,10 +1,22 @@
-<header>
-    <h1>AConverter</h1>
-    @for(currency of currencies; track currency.currencyCodeA) {
-    <div>
-        <h3>{{currencyCodes[currency.currencyCodeA.toString()]}}</h3>
-        <h4>Buy: {{currency.rateBuy}}</h4>
-        <h4>Sell: {{currency.rateSell}}</h4>
+<header class="app-header">
+    <h1 class="app-header__title"><strong class="app-header__title_red-highlight">A</strong>Converter</h1>
+    <div class="app-header__currencies-wrapper">
+        @for(currency of currencies; track currency.currencyCodeA) {
+        <div class="app-header__currency">
+            <h3 class="app-header__currency-title">{{currencyCodes[currency.currencyCodeA.toString()]}}</h3>
+            <h4 class="app-header__currency-buy">Sell: {{currency.rateBuy}}</h4>
+            <h4 class="app-header__currency-sell">Buy: {{currency.rateSell}}</h4>
+        </div>
+        <!-- <div class="app-header__currency"> -->
+            <!-- <h3 class="app-header__currency-title">UAH</h3> -->
+            <!-- <h4 class="app-header__currency-buy">Buy: 123.222</h4> -->
+            <!-- <h4 class="app-header__currency-sell">Sell: 123.124</h4> -->
+        <!-- </div> -->
+        <!-- <div class="app-header__currency"> -->
+            <!-- <h3 class="app-header__currency-title">USD</h3> -->
+            <!-- <h4 class="app-header__currency-buy">Buy: 123.124</h4> -->
+            <!-- <h4 class="app-header__currency-sell">Sell: 123.124</h4> -->
+        <!-- </div> -->
+        }
     </div>
-    }
 </header>
