@@ -8,9 +8,12 @@
   <ng-template #elseBlock>
     <app-exchange-header [currencies]="dataUah"></app-exchange-header>
     <label for="sell-reactive">sell:</label>
-    <app-exchange-input name="sell-reactive" [control]="formGroup.controls.sell"/>
+    <app-exchange-select [options]="data" [formControl]="sellSelect"></app-exchange-select>
+
+    <app-exchange-input name="sell-reactive" [minValue]="0.001" [stepValue]="3" [formControl]="sellControl" />
     <label for="buy-reactive">buy:</label>
-    <app-exchange-input name="buy-reactive" [control]="formGroup.controls.buy"/>
+    <app-exchange-input name="buy-reactive" [formControl]="buyControl" />
+
     <div class="content-wrapper">
       <div class="content">
         <div class="content__sell">

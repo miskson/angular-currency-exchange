@@ -1,15 +1,23 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, Input, forwardRef } from '@angular/core';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { ControlValueAccessorDirective } from '../../control-value-accessor.directive';
 
 @Component({
   selector: 'app-exchange-input',
   standalone: true,
-  imports: [ReactiveFormsModule, NgFor, NgIf, CommonModule],
+  imports: [ReactiveFormsModule, FormsModule, NgFor, NgIf, CommonModule],
   templateUrl: './exchange-input.component.html',
   styleUrl: './exchange-input.component.scss',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => ExchangeInputComponent),
+      multi: true,
+    },
+  ],
 })
-export class ExchangeInputComponent {
+export class ExchangeInputComponent<T> extends ControlValueAccessorDirective<T> {
   @Input() name: string = 'app-input';
 
   @Input() minValue: number = 0.1;
@@ -17,16 +25,6 @@ export class ExchangeInputComponent {
   @Input() stepValue: number = 0.1;
 
   @Input() inputId: string = window.crypto.randomUUID();
-
-  @Input() control: FormControl = new FormControl();
-
-  @Output() onValueChange: EventEmitter<string> = new EventEmitter<string>();
-
-  onChange!: (value: number) => void;
-
-  onTouched!: () => void;
-
-  inputValue: number = 0.1;
 
   errorMessages: Record<string, string> = {
     required: 'This field is required.',

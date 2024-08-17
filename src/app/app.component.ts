@@ -7,13 +7,13 @@ import { CurrencyInfo } from './interfaces/data';
 import { firstValueFrom, retryWhen, switchMap, throwError, timer } from 'rxjs';
 import {
   FormControl,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { NgIf } from '@angular/common';
+import {  NgIf } from '@angular/common';
 import { ExchangeInputComponent } from './components/exchange-input/exchange-input.component';
+import { ExchangeSelectComponent } from './components/exchange-select/exchange-select.component';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +22,7 @@ import { ExchangeInputComponent } from './components/exchange-input/exchange-inp
     RouterOutlet,
     ExchangeHeaderComponent,
     ExchangeInputComponent,
+    ExchangeSelectComponent,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -41,23 +42,25 @@ export class AppComponent implements OnInit {
   currentSellCurrency: string = '980';
   currentBuyCurrency: string = '840';
 
-  formGroup = new FormGroup({
-    sell: new FormControl(0.1, [Validators.required, Validators.min(0)]),
-    buy: new FormControl(0.1, [Validators.required, Validators.min(0)]),
-  });
+  sellControl = new FormControl(0.1, [
+    Validators.required,
+    Validators.min(0.001),
+  ]);
+  buyControl = new FormControl(0.1, [
+    Validators.required,
+    Validators.min(0.001),
+  ]);
+
+  sellSelect = new FormControl('840', [Validators.required]);
+  buySelect = new FormControl('840', [Validators.required]);
 
   sellValue: number = 1;
   buyValue: number = 1;
 
   constructor(private dataService: DataService) {
-    this.formGroup.get('sell')?.valueChanges.subscribe((value) => {
-      console.log('sell', this.formGroup.controls.sell);
-      // this.convertCurrency('sell');
-    });
-    this.formGroup.get('buy')?.valueChanges.subscribe((value) => {
-      console.log('buy', this.formGroup.controls.buy);
-      // this.convertCurrency('buy');
-    });
+    this.sellSelect.valueChanges.subscribe(value => {
+      console.log('sell select', value, typeof value)
+    })
   }
 
   trimDigits(num: number) {

@@ -1,0 +1,8 @@
+<div *ngIf="control" class="app__select">
+    <select [formControl]="control" [name]="name" [id]="selectId">
+        <option *ngFor="let currency of options"
+            [value]="currencyCodes[currency.currencyCodeA.toString()]? currency.currencyCodeA.toString() : currency.currencyCodeB.toString()">
+            {{currencyCodes[currency.currencyCodeA.toString()] || currencyCodes[currency.currencyCodeB.toString()]}}
+        </option>
+    </select>
+</div>

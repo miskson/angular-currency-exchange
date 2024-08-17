@@ -1,7 +1,14 @@
-<div class="app-input">
+<div class="app-input" *ngIf="control">
     <div class="app-input__outline">
-        <input [id]="inputId" class="app-input__field" [name]="'buy'" type="number" [min]="0.01" [step]="0.1"
-            [value]="inputValue" [formControl]="control" />
+        <input 
+            [id]="inputId" 
+            class="app-input__field" 
+            [name]="name" 
+            type="number" 
+            [min]="0.01" 
+            [step]="0.1"
+            [formControl]="control"
+        />
     </div>
     <div class="app-input__error-wrapper">
         <ng-container *ngIf="control.invalid && control.dirty">
