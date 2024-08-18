@@ -11,7 +11,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import {  NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { ExchangeInputComponent } from './components/exchange-input/exchange-input.component';
 import { ExchangeSelectComponent } from './components/exchange-select/exchange-select.component';
 
@@ -38,6 +38,7 @@ export class AppComponent implements OnInit {
   loadingMessage: string = 'Loading, please wait...';
   data: CurrencyInfo[] = [];
   dataUah: CurrencyInfo[] = [];
+  currencyCodesArr: number[] = [];
 
   currentSellCurrency: string = '980';
   currentBuyCurrency: string = '840';
@@ -58,9 +59,9 @@ export class AppComponent implements OnInit {
   buyValue: number = 1;
 
   constructor(private dataService: DataService) {
-    this.sellSelect.valueChanges.subscribe(value => {
-      console.log('sell select', value, typeof value)
-    })
+    this.sellSelect.valueChanges.subscribe((value) => {
+      console.log('sell select', value, typeof value);
+    });
   }
 
   trimDigits(num: number) {
@@ -211,6 +212,10 @@ export class AppComponent implements OnInit {
       this.dataUah = this.data.filter(
         (currency) => currency.currencyCodeB === 980
       );
+      this.currencyCodesArr = [
+        ...this.data.map((item) => item.currencyCodeA),
+        ...this.data.map((item) => item.currencyCodeB),
+      ].filter((item, index, rep) => rep.indexOf(item) === index);
     } catch (err) {
       console.error(err, 'Request error!');
     }

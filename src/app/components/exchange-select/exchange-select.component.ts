@@ -5,7 +5,6 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { ControlValueAccessorDirective } from '../../control-value-accessor.directive';
-import { CurrencyInfo } from '../../interfaces/data';
 import { NgFor, NgIf } from '@angular/common';
 
 @Component({
@@ -29,7 +28,7 @@ export class ExchangeSelectComponent<
 
   @Input() selectId: string = window.crypto.randomUUID();
 
-  @Input() options: CurrencyInfo[] = [];
+  @Input() options: number[] = [];
 
   @Input() value: number = this.control?.value;
 
