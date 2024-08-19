@@ -10,37 +10,17 @@
     <div class="content-wrapper">
       <div class="content">
         <div class="content__sell">
-          <label class="content__label" for="sell-select">Sell:</label>
-          <div class="content__select">
-            <select name="sell-select" id="from-currency-select" (change)="onSellCurrencyChange($event)"
-              [value]="currentSellCurrency">
-              <option value="980">UAH</option>
-              <option value="840">USD</option>
-              <option value="978">EUR</option>
-            </select>
-          </div>
-          <div class="content__input-outline">
-            <input class="content__input" name="sell" type="number" min="0.1" step="0.1" [(ngModel)]="sellValue"
-              (ngModelChange)="onSellInputChange($event)">
-          </div>
+          <label class="content__label" for="sell-reactive">Sell:</label>
+          <app-exchange-select [options]="currencyCodesArr" [formControl]="sellSelect" />
+          <app-exchange-input name="sell-reactive" [minValue]="0.001" [stepValue]="3" [formControl]="sellControl" />
         </div>
         <div class="content__arrows">
           <img src="../assets/img/arrows.png" alt="from-to">
         </div>
         <div class="content__buy">
-          <label class="content__label" for="buy-select">Buy:</label>
-          <div class="content__select">
-            <select class="content__buy-select" name="buy-select" id="to-currency-select" [value]="currentBuyCurrency"
-              (change)="onBuyCurrencyChange($event)">
-              <option value="980">UAH</option>
-              <option value="840">USD</option>
-              <option value="978">EUR</option>
-            </select>
-          </div>
-          <div class="content__input-outline">
-            <input class="content__input" name="buy" type="number" min="0.1" step="0.1" [(ngModel)]="buyValue"
-              (ngModelChange)="onBuyInputChange($event)">
-          </div>
+          <label class="content__label" for="buy-reactive">Buy:</label>
+          <app-exchange-select [options]="currencyCodesArr" [formControl]="buySelect" />
+          <app-exchange-input name="buy-reactive" [minValue]="0.001" [stepValue]="3" [formControl]="buyControl" />
         </div>
       </div>
     </div>

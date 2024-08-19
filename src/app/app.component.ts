@@ -4,9 +4,23 @@ import { ExchangeHeaderComponent } from './components/exchange-header/exchange-h
 import { HttpClientModule } from '@angular/common/http';
 import { DataService } from './services/data/data.service';
 import { CurrencyInfo } from './interfaces/data';
-import { firstValueFrom, retryWhen, switchMap, throwError, timer } from 'rxjs';
-import { FormsModule } from '@angular/forms';
+import {
+  Subscription,
+  firstValueFrom,
+  retryWhen,
+  switchMap,
+  throwError,
+  timer,
+} from 'rxjs';
+import {
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { NgIf } from '@angular/common';
+import { ExchangeInputComponent } from './components/exchange-input/exchange-input.component';
+import { ExchangeSelectComponent } from './components/exchange-select/exchange-select.component';
 
 @Component({
   selector: 'app-root',
@@ -14,8 +28,11 @@ import { NgIf } from '@angular/common';
   imports: [
     RouterOutlet,
     ExchangeHeaderComponent,
+    ExchangeInputComponent,
+    ExchangeSelectComponent,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     NgIf,
   ],
   templateUrl: './app.component.html',
@@ -24,17 +41,57 @@ import { NgIf } from '@angular/common';
 export class AppComponent implements OnInit {
   title = 'angular-currency-exchange';
 
-  constructor(private dataService: DataService) {}
-
   isLoading: boolean = false;
   loadingMessage: string = 'Loading, please wait...';
   data: CurrencyInfo[] = [];
   dataUah: CurrencyInfo[] = [];
+  currencyCodesArr: number[] = [];
+  private subscriptions: Subscription[] = [];
+  isUpdating: boolean = false;
 
   currentSellCurrency: string = '980';
   currentBuyCurrency: string = '840';
+
+  sellControl = new FormControl(1, [
+    Validators.required,
+    Validators.min(0.001),
+  ]);
+  buyControl = new FormControl(0.1, [
+    Validators.required,
+    Validators.min(0.001),
+  ]);
+
+  sellSelect = new FormControl('840', [Validators.required]);
+  buySelect = new FormControl('980', [Validators.required]);
+
   sellValue: number = 1;
   buyValue: number = 1;
+
+  constructor(private dataService: DataService) {
+    this.subscriptions.push(
+      this.sellSelect.valueChanges.subscribe(() => {
+        this.convertValues('sell');
+      })
+    );
+
+    this.subscriptions.push(
+      this.sellControl.valueChanges.subscribe(() => {
+        this.convertValues('sell');
+      })
+    );
+
+    this.subscriptions.push(
+      this.buySelect.valueChanges.subscribe(() => {
+        this.convertValues('buy');
+      })
+    );
+
+    this.subscriptions.push(
+      this.buyControl.valueChanges.subscribe(() => {
+        this.convertValues('buy');
+      })
+    );
+  }
 
   trimDigits(num: number) {
     if (!Number.isInteger(num)) {
@@ -53,94 +110,57 @@ export class AppComponent implements OnInit {
     }
   }
 
-  onSellCurrencyChange(e: Event): void {
-    this.currentSellCurrency = (e.target as HTMLInputElement).value;
-    this.convertCurrency('sell');
-  }
+  convertValues(operation: 'sell' | 'buy') {
+    if (this.isUpdating) return;
 
-  onBuyCurrencyChange(e: Event): void {
-    this.currentBuyCurrency = (e.target as HTMLInputElement).value;
-    this.convertCurrency('buy');
-  }
+    if (this.sellSelect.value === this.buySelect.value) {
+      this.isUpdating = true;
+      const temp =
+        operation === 'sell' ? this.sellControl.value : this.buyControl.value;
 
-  onSellInputChange(value: number): void {
-    this.sellValue = value;
-    this.convertCurrency('sell');
-  }
+      this.sellControl.setValue(temp, { onlySelf: true, emitEvent: false });
+      this.buyControl.setValue(temp, { onlySelf: true, emitEvent: false });
 
-  onBuyInputChange(value: number): void {
-    this.buyValue = value;
-    this.convertCurrency('buy');
-  }
-
-  convertCurrency(operation: 'sell' | 'buy') {
-    if (+this.currentBuyCurrency === +this.currentSellCurrency) {
-      //if currencies are the same then rate 1-1
-      const temp = operation === 'sell' ? +this.sellValue : this.buyValue;
-      this.sellValue = temp;
-      this.buyValue = temp;
+      this.isUpdating = false;
     } else {
-      let currentUAHArr: CurrencyInfo[] = [];
-      let actualCurrency: CurrencyInfo | undefined;
+      let isRevert = false;
+      let actualCurrency: CurrencyInfo | undefined = this.data.find((item) => {
+        let caseRevert =
+          item.currencyCodeA === Number(this.sellSelect.value) &&
+          item.currencyCodeB === Number(this.buySelect.value);
 
-      if (
-        +this.currentSellCurrency === 980 ||
-        +this.currentBuyCurrency === 980
-      ) {
-        // if UAH is present in either sell or buy operation
-        // get all currencies with currencyCode === 980 (UAH)
-        currentUAHArr = this.data.filter(
-          (currency) => currency.currencyCodeB === 980
-        );
+        let caseNormal =
+          item.currencyCodeA === Number(this.buySelect.value) &&
+          item.currencyCodeB === Number(this.sellSelect.value);
 
-        actualCurrency = currentUAHArr.find(
-          (currency) =>
-            +this.currentBuyCurrency === currency.currencyCodeA ||
-            +this.currentSellCurrency === currency.currencyCodeA
-        );
-      }
-
+        if (caseNormal) {
+          return caseNormal;
+        } else if (caseRevert) {
+          isRevert = true;
+          return caseRevert;
+        } else {
+          return;
+        }
+      });
+      this.isUpdating = true;
       if (operation === 'sell') {
-        if (currentUAHArr.length > 0) {
-          const sellRate =
-            +this.currentBuyCurrency === 980
-              ? (actualCurrency?.rateSell as number)
-              : 1 / (actualCurrency?.rateSell as number);
-
-          this.buyValue = this.trimDigits(
-            (this.sellValue as number) * sellRate
-          );
-        } else {
-          actualCurrency = this.data.find(
-            (currency) => currency.currencyCodeB !== 980
-          );
-          let rate =
-            +this.currentSellCurrency === actualCurrency?.currencyCodeA
-              ? (actualCurrency?.rateSell as number)
-              : 1 / (actualCurrency?.rateSell as number);
-
-          this.buyValue = this.trimDigits((this.sellValue as number) * rate);
-        }
-      } else if (operation === 'buy') {
-        if (currentUAHArr.length > 0) {
-          const buyRate =
-            +this.currentSellCurrency === 980
-              ? (actualCurrency?.rateBuy as number)
-              : 1 / (actualCurrency?.rateBuy as number);
-
-          this.sellValue = this.trimDigits((this.buyValue as number) * buyRate);
-        } else {
-          actualCurrency = this.data.find(
-            (currency) => currency.currencyCodeB !== 980
-          );
-          let rate =
-            +this.currentBuyCurrency === actualCurrency?.currencyCodeB
-              ? 1 / (actualCurrency?.rateBuy as number)
-              : (actualCurrency?.rateBuy as number);
-
-          this.sellValue = this.trimDigits((this.buyValue as number) * rate);
-        }
+        let buyRate = isRevert
+          ? Number(actualCurrency?.rateSell)
+          : 1 / Number(actualCurrency?.rateSell);
+        this.buyControl.setValue(
+          this.trimDigits(Number(this.sellControl.value) * buyRate),
+          { onlySelf: true, emitEvent: false }
+        );
+      } else if ('buy') {
+        let sellRate = isRevert
+          ? 1 / Number(actualCurrency?.rateBuy)
+          : Number(actualCurrency?.rateBuy);
+        this.sellControl.setValue(
+          this.trimDigits(Number(this.buyControl.value) * sellRate),
+          { onlySelf: true, emitEvent: false }
+        );
       }
+      this.isUpdating = false;
     }
   }
 
@@ -149,7 +169,7 @@ export class AppComponent implements OnInit {
     this.loadingMessage = 'Loading, please wait...';
     this.getCurrencyData()
       .then(() => {
-        this.convertCurrency('sell');
+        this.convertValues('sell');
       })
       .catch((err) => {
         console.error(err, 'Failed to load currency data');
@@ -184,6 +204,10 @@ export class AppComponent implements OnInit {
       this.dataUah = this.data.filter(
         (currency) => currency.currencyCodeB === 980
       );
+      this.currencyCodesArr = [
+        ...this.data.map((item) => item.currencyCodeA),
+        ...this.data.map((item) => item.currencyCodeB),
+      ].filter((item, index, rep) => rep.indexOf(item) === index);
     } catch (err) {
       console.error(err, 'Request error!');
     }
@@ -191,5 +215,9 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCurrencyData();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }
