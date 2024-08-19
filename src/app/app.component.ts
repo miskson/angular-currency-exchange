@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
   currentSellCurrency: string = '980';
   currentBuyCurrency: string = '840';
 
-  sellControl = new FormControl(0.1, [
+  sellControl = new FormControl(1, [
     Validators.required,
     Validators.min(0.001),
   ]);
@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
   ]);
 
   sellSelect = new FormControl('840', [Validators.required]);
-  buySelect = new FormControl('840', [Validators.required]);
+  buySelect = new FormControl('980', [Validators.required]);
 
   sellValue: number = 1;
   buyValue: number = 1;
@@ -144,11 +144,21 @@ export class AppComponent implements OnInit {
       });
       this.isUpdating = true;
       if (operation === 'sell') {
-        let buyRate = isRevert? Number(actualCurrency?.rateSell) : (1 / Number(actualCurrency?.rateSell))
-        this.buyControl.setValue(this.trimDigits(Number(this.sellControl.value) * buyRate), {onlySelf: true, emitEvent: false,});
+        let buyRate = isRevert
+          ? Number(actualCurrency?.rateSell)
+          : 1 / Number(actualCurrency?.rateSell);
+        this.buyControl.setValue(
+          this.trimDigits(Number(this.sellControl.value) * buyRate),
+          { onlySelf: true, emitEvent: false }
+        );
       } else if ('buy') {
-        let sellRate = isRevert? (1 / Number(actualCurrency?.rateBuy)) : Number(actualCurrency?.rateBuy)
-        this.sellControl.setValue(this.trimDigits(Number(this.buyControl.value) * sellRate), {onlySelf: true, emitEvent: false,});
+        let sellRate = isRevert
+          ? 1 / Number(actualCurrency?.rateBuy)
+          : Number(actualCurrency?.rateBuy);
+        this.sellControl.setValue(
+          this.trimDigits(Number(this.buyControl.value) * sellRate),
+          { onlySelf: true, emitEvent: false }
+        );
       }
       this.isUpdating = false;
     }
@@ -159,7 +169,7 @@ export class AppComponent implements OnInit {
     this.loadingMessage = 'Loading, please wait...';
     this.getCurrencyData()
       .then(() => {
-        this.isLoading = false;
+        this.convertValues('sell');
       })
       .catch((err) => {
         console.error(err, 'Failed to load currency data');
