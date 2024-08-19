@@ -1,0 +1,20 @@
+<div class="app-input" *ngIf="control">
+    <div class="app-input__outline">
+        <input 
+            [id]="inputId" 
+            class="app-input__field" 
+            [name]="name" 
+            type="number" 
+            [min]="0.01" 
+            [step]="0.1"
+            [formControl]="control"
+        />
+    </div>
+    <div class="app-input__error-wrapper">
+        <ng-container *ngIf="control.invalid && control.dirty">
+            <small class="app-input__error" *ngFor="let err of control.errors | keyvalue">
+                {{ errorMessages[err.key] }}
+            </small>
+        </ng-container>
+    </div>
+</div>

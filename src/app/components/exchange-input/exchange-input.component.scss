@@ -1,0 +1,57 @@
+.app-input {
+    &__outline {
+        border: 2px solid #C4C4C4;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        height: 40px;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        padding: 0 10px;
+        width: 234px;
+        cursor: text;
+        position: relative;
+        border-radius: 7px;
+    
+        &:focus-within {
+            border-color: #f2a705;
+        }
+    
+        @media (min-width: 300px) {
+            width: 274px;
+        }
+    }
+    
+    &__field {
+        background-color: #fff;
+        border: none;
+        outline: none;
+        font-size: 18px;
+        width: 100%;
+    
+    }
+    
+    &__field:-webkit-autofill,
+    &__field:-webkit-autofill:hover,
+    &__field:-webkit-autofill:focus,
+    &__field:-webkit-autofill:active {
+        color: black !important;
+        -webkit-text-fill-color: black !important;
+        -webkit-box-shadow: 0 0 0 1000px white inset !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+    }
+    
+    &__field:-webkit-autofill::first-line {
+        font-size: 18px;
+    }
+
+    &__error-wrapper {
+        min-height: 28px;
+    }
+
+    &__error {
+        color: #D32F2F;
+        font-size: 16px;
+    }
+}
