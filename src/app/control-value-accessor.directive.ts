@@ -33,10 +33,7 @@ export class ControlValueAccessorDirective<T>
   }
 
   writeValue(value: T): void {
-    if (this.control) {
-      this.control.setValue(value, { emitEvent: false });
-      this.control.updateValueAndValidity();
-    } else {
+    if (!this.control) {
       this.control = new FormControl(value);
     }
   }
