@@ -1,0 +1,47 @@
+.app__select {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 70px;
+    display: block;
+    float: right;
+    position: relative;
+
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        font-size: 18px;
+        width: 100%;
+        padding: 8px;
+        background-color: #fff;
+        border: 1px dashed #101010;
+        border-radius: 5px;
+        color: #101010;
+        cursor: pointer;
+
+        @media (min-width: 912px) {
+            font-size: 1.17em;
+        }
+    }
+}
+
+.app__select::before,
+.app__select::after {
+    --size: 6px;
+    position: absolute;
+    content: "";
+    right: 6px;
+    pointer-events: none;
+}
+
+.app__select::before {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-bottom: var(--size) solid #101010;
+    top: 34%;
+}
+
+.app__select::after {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-top: var(--size) solid #101010;
+    top: 56%;
+}
